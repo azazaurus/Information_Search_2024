@@ -25,6 +25,7 @@ def main(
 			"hvost.news"
 		],
 		blacklisted_urls: Optional[list[str]] = [
+			"https://hvost.news/agreement/",
 			"https://hvost.news/contacts/",
 			"https://hvost.news/privacy/"
 		]):
