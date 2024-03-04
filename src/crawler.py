@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Set, Union
+from typing import List, Optional, Set, Union
 from urllib.parse import urldefrag, urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -21,10 +21,10 @@ def main(
 		root_page_url: str = "https://hvost.news/",
 		max_pages_count: int = 100,
 		min_words_per_page_count: int = 0,
-		whitelisted_domains: Optional[list[str]] = [
+		whitelisted_domains: Optional[List[str]] = [
 			"hvost.news"
 		],
-		blacklisted_urls: Optional[list[str]] = [
+		blacklisted_urls: Optional[List[str]] = [
 			"https://hvost.news/agreement/",
 			"https://hvost.news/contacts/",
 			"https://hvost.news/privacy/"
@@ -99,8 +99,8 @@ def _download(url: str, seen_page_urls: Set[str]) -> Union[str, Exception, None]
 def _get_link_urls(
 		current_url: str,
 		parsed_page: BeautifulSoup,
-		whitelisted_domains: Optional[set[str]],
-		blacklisted_urls: set[str]) -> list[str]:
+		whitelisted_domains: Optional[Set[str]],
+		blacklisted_urls: Set[str]) -> List[str]:
 	if parsed_page.body is None:
 		return []
 
