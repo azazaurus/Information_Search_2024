@@ -8,6 +8,9 @@ from nltk.corpus import stopwords
 from nltk.tokenize import wordpunct_tokenize
 
 
+nltk.download('stopwords')
+
+
 class ProcessingContext:
     def __init__(self):
         self.pages_dir_path = 'raw-pages/pages/'
@@ -54,7 +57,6 @@ def write_tokens(processing_context):
 
 
 def is_correct(processing_context, token):
-    nltk.download('stopwords')
     are_stuck_words = False
     if sum(map(str.isupper, token[1:])) > 0 and (sum(map(str.islower, token[1:])) > 0 or str.islower(token[0])):
         are_stuck_words = True
