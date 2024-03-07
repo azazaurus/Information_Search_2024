@@ -106,13 +106,27 @@ def _get_link_urls(
 
 	a_tags = parsed_page.body.find_all("a")
 	urls = (tag.get("href", default = "") for tag in a_tags)
-	urls = (urldefrag(urljoin(current_url, url))[0] for url in urls)
+	urls = ((url, urldefrag(urljoin(current_url, url))[0]) for url in urls)
 	return list(
-		filter(
-			lambda url: validators.url(url)
-				and url not in blacklisted_urls
-				and (whitelisted_domains is None or urlparse(url).netloc in whitelisted_domains),
-			urls))
+		map(
+			lambda url_pair: url_pair[1],
+			filter(
+				lambda url_pair: is_url_valid(url_pair[0], url_pair[1], whitelisted_domains, blacklisted_urls),
+				urls)))
+
+
+def is_url_valid(
+		original_url: str,
+		url: str,
+		whitelisted_domains: Optional[Set[str]],
+		blacklisted_urls: Set[str]) -> bool:
+	if not validators.url(url) or url in blacklisted_urls:
+		return False
+
+	parsed_original_url = urlparse(original_url)
+	return (whitelisted_domains is None or urlparse(url).netloc in whitelisted_domains) \
+		and parsed_original_url.scheme in ["", "http", "https"] \
+		and not (parsed_original_url.scheme == "" and ":" in parsed_original_url.path) # avoid tel, mailto, and similar links
 
 
 def get_text(markup: BeautifulSoup) -> str:
