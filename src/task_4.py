@@ -1,5 +1,8 @@
+import os
 import re
 import string
+from pathlib import Path
+from typing import Dict
 
 import nltk
 import pymorphy3
@@ -114,12 +117,39 @@ def calculate_lemma_tf(processing_context: ProcessingContext, pages_tokens: list
     return pages_tf
 
 
+def calculate_lemmas_idf(lemma_tf: list):
+    idf = {}
+    pages_count = len(lemma_tf)
+    for page in lemma_tf:
+        for lemma in page:
+            if lemma not in idf:
+                idf[lemma] = pages_count / find_token_entrance_count_among_pages(lemma_tf, lemma)
+
+    return idf
+
+
+def write_tf_idf(tf: list, idf: dict, directory_name: str):
+    for page_number in range(0, len(tf)):
+        tf_idf_file_direction = 'raw-pages/' + directory_name + '/' + str(page_number) + '.txt'
+        Path('raw-pages/' + directory_name).mkdir(exist_ok=True)
+        with open(tf_idf_file_direction, 'w') as file:
+            for term in tf[page_number]:
+                line = term + ' '
+                line += str(tf[page_number][term]) + ' '
+                line += str(idf[term])
+                line += '\n'
+                file.write(line)
+
+
 def main():
     processing_context = ProcessingContext()
     pages_tokens = get_pages_tokens(processing_context)
     token_tf = calculate_token_tf(pages_tokens)
     token_idf = calculate_token_idf(pages_tokens)
     lemma_tf = calculate_lemma_tf(processing_context, pages_tokens)
+    lemma_idf = calculate_lemmas_idf(lemma_tf)
+    write_tf_idf(token_tf, token_idf, 'token_tf_idf')
+    write_tf_idf(lemma_tf, lemma_idf, 'lemma_tf_idf')
 
 
 if __name__ == '__main__':
