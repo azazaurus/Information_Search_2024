@@ -94,11 +94,32 @@ def find_token_entrance_count_among_pages(pages_tokens, token):
     return counter
 
 
+def calculate_lemma_tf(processing_context: ProcessingContext, pages_tokens: list):
+    pages_tf = []
+    for page in pages_tokens:
+        page_tf = {}
+        for token in page:
+            parsed_token = processing_context.morph_analyzer.parse(token)[0]
+            normal_form = parsed_token.normal_form if parsed_token.normalized.is_known else token.lower()
+            if normal_form not in page_tf:
+                page_tf[normal_form] = page.get(token)
+            else:
+                page_tf[normal_form] += page.get(token)
+
+        for lemma in page_tf:
+            page_tf[lemma] = page_tf[lemma] / len(page)
+
+        pages_tf.append(page_tf)
+
+    return pages_tf
+
+
 def main():
     processing_context = ProcessingContext()
     pages_tokens = get_pages_tokens(processing_context)
     token_tf = calculate_token_tf(pages_tokens)
     token_idf = calculate_token_idf(pages_tokens)
+    lemma_tf = calculate_lemma_tf(processing_context, pages_tokens)
 
 
 if __name__ == '__main__':
