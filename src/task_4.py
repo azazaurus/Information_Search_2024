@@ -74,10 +74,31 @@ def calculate_token_tf(pages_tokens: list):
     return pages_tf
 
 
+def calculate_token_idf(pages_tokens: list):
+    idf = {}
+    pages_count = len(pages_tokens)
+    for page in pages_tokens:
+        for token in page:
+            if token not in idf:
+                idf[token] = pages_count / find_token_entrance_count_among_pages(pages_tokens, token)
+
+    return idf
+
+
+def find_token_entrance_count_among_pages(pages_tokens, token):
+    counter = 0
+    for page in pages_tokens:
+        if token in page:
+            counter = counter + 1
+
+    return counter
+
+
 def main():
     processing_context = ProcessingContext()
     pages_tokens = get_pages_tokens(processing_context)
     token_tf = calculate_token_tf(pages_tokens)
+    token_idf = calculate_token_idf(pages_tokens)
 
 
 if __name__ == '__main__':
