@@ -1,8 +1,7 @@
-import os
+import math
 import re
 import string
 from pathlib import Path
-from typing import Dict
 
 import nltk
 import pymorphy3
@@ -83,7 +82,7 @@ def calculate_token_idf(pages_tokens: list):
     for page in pages_tokens:
         for token in page:
             if token not in idf:
-                idf[token] = pages_count / find_token_entrance_count_among_pages(pages_tokens, token)
+                idf[token] = math.log(pages_count / find_token_entrance_count_among_pages(pages_tokens, token))
 
     return idf
 
@@ -123,7 +122,7 @@ def calculate_lemmas_idf(lemma_tf: list):
     for page in lemma_tf:
         for lemma in page:
             if lemma not in idf:
-                idf[lemma] = pages_count / find_token_entrance_count_among_pages(lemma_tf, lemma)
+                idf[lemma] = math.log(pages_count / find_token_entrance_count_among_pages(lemma_tf, lemma))
 
     return idf
 
