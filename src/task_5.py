@@ -72,9 +72,15 @@ class VectorSearch:
     def search(self, pages_lemmas_tf_idf: list[dict], query_lemmas_tf_idf: dict):
         result_documents = list()
 
+        query_vector_tf_idf = list(
+            map(
+                lambda x: x[1],
+                sorted(query_lemmas_tf_idf.items(), key = lambda x: x[0])))
         for page_id in range(len(pages_lemmas_tf_idf)):
-            page_vector_tf_idf = list(pages_lemmas_tf_idf[page_id].values())
-            query_vector_tf_idf = list(query_lemmas_tf_idf.values())
+            page_vector_tf_idf = list(
+                map(
+                    lambda x: x[1],
+                    sorted(pages_lemmas_tf_idf[page_id].items(), key = lambda x: x[0])))
             if self.calculate_distance(page_vector_tf_idf, query_vector_tf_idf) < self.__distance_threshold:
                 result_documents.append(page_id)
 
