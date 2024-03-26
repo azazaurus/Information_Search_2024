@@ -58,6 +58,17 @@ class VectorSearch:
 
         return query_lemmas_tf
 
+
+    def complement_page_vector(self, pages_lemmas_tf_idf, query_lemmas_tf_idf):
+        complemented_page_vector = copy(pages_lemmas_tf_idf)
+        for page in pages_lemmas_tf_idf:
+            for lemma in query_lemmas_tf_idf:
+                if lemma not in page:
+                    page[lemma] = 0
+
+        return complemented_page_vector
+
+
     def search(self, pages_lemmas_tf_idf: list[dict], query_lemmas_tf_idf: dict):
         result_documents = list()
 
@@ -103,7 +114,8 @@ def main():
         query_lemmas_tf_idf = VectorSearch().calculate_query_tf_idf(VectorSearch().calculate_query_tf(pc, query),
                                                                     lemmas_idf)
 
-        result_documents = search.search(lemmas_tf_idf, query_lemmas_tf_idf)
+        complemented_pages_vector = VectorSearch().complement_page_vector(lemmas_tf_idf, query_lemmas_tf_idf)
+        result_documents = search.search(complemented_pages_vector, query_lemmas_tf_idf)
         print('smthng')
 
         if len(result_documents) > 0:
