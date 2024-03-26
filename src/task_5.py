@@ -42,12 +42,10 @@ class VectorSearch:
         return pages_tf_idf, lemma_idf
 
     def calculate_query_tf_idf(self, query_lemmas_tf, pages_idf):
-        query_tf_idf: dict[str, float] = {}
-        for page_idf in pages_idf:
-            for lemma in query_lemmas_tf:
-                if lemma in pages_idf:
-                    query_tf_idf = {x: 0 for x in copy(pages_idf)}
-                    query_tf_idf[lemma] = query_lemmas_tf[lemma] * pages_idf[lemma]
+        query_tf_idf: dict[str, float] = {x: 0 for x in copy(pages_idf)}
+        for lemma in query_lemmas_tf:
+            if lemma in pages_idf:
+                query_tf_idf[lemma] = query_lemmas_tf[lemma] * pages_idf[lemma]
 
         return query_tf_idf
 
