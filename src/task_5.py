@@ -122,11 +122,12 @@ def main():
 
         complemented_pages_vector = VectorSearch().complement_page_vector(lemmas_tf_idf, query_lemmas_tf_idf)
         result_documents = search.search(complemented_pages_vector, query_lemmas_tf_idf)
-        print('smthng')
 
+        print('\n\nРезультаты: \n')
         if len(result_documents) > 0:
             for document_id in result_documents:
-                print(index[document_id: str])
+                url = index[str(document_id)]
+                print('ID страницы: ' + str(document_id) + ' | URL: ' + url)
         else:
             print("Ничего не найдено")
         print()
