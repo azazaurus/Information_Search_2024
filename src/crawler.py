@@ -34,6 +34,7 @@ def main(
 	log.debug("Initializing page repository")
 	page_repository = RawPageRepository()
 	page_repository.delete_all()
+	outcome_links = []
 
 	page_urls_to_download = deque([root_page_url])
 	seen_page_urls = {root_page_url}
@@ -72,10 +73,13 @@ def main(
 					f"Unable to save {page_url}:" + os.linesep + format_exception(exception))
 	
 		child_urls = set(_get_link_urls(page_url, parsed_page, whitelisted_domains_set, blacklisted_urls_set))
+		outcome_links.append(child_urls)
 		child_urls = child_urls.difference(seen_page_urls)
 
 		page_urls_to_download.extend(child_urls)
 		seen_page_urls = seen_page_urls.union(child_urls)
+
+	return outcome_links
 
 
 def _download(url: str, seen_page_urls: Set[str]) -> Union[str, Exception, None]:

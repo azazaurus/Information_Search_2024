@@ -93,11 +93,11 @@ def get_normalized_form(processing_context, token):
 
 
 def get_index():
-    index: dict[str, str] = {}
+    index: dict[int, str] = {}
     with open('raw-pages/index.txt', 'r', encoding='utf-8') as index_file:
         line = index_file.readline()
         while line:
-            index[line.split(' ')[0]] = line.split(' ')[1]
+            index[int(line.split(' ')[0])] = line.split(' ')[1].split('\n')[0]
             line = index_file.readline()
 
     return index
