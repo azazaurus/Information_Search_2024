@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import task_5
 import crawler
@@ -8,16 +8,13 @@ def invert_dictionary(dictionary):
     return dict((v, k) for k, v in dictionary.items())
 
 
-def convert_to_income_links_list(links_list: List[list], index: dict):
-    pages_count = len(index)
-    inverted_index = invert_dictionary(index)
-    income_links_list: List[list] = [list()] * pages_count
-    for i in range(pages_count):
-        for outcome_link in links_list[i]:
-            if (outcome_link in inverted_index) and (outcome_link not in income_links_list[inverted_index[outcome_link]]):
-                income_links_list[inverted_index[outcome_link]].append(index[i])
-
-    return income_links_list
+def convert_to_income_links(outcome_links: Dict[int, List[int]]) -> Dict[int, List[int]]:
+    income_links: Dict[int, List[int]] = {}
+    for page_id, page_outcome_links in outcome_links.items():
+        for target_page_id in page_outcome_links:
+            income_links.setdefault(target_page_id, [])
+            income_links[target_page_id].append(page_id)
+    return income_links
 
 
 def rank(outcome_links_list: List[list], index, threshold: float = 0.000001) -> list:
@@ -55,11 +52,21 @@ def pagination():
     raise NotImplemented
 
 
+def filter_self_loop_links(links: Dict[int, List[int]]):
+    for page_id, page_links in links.items():
+        try:
+            page_links.remove(page_id)
+        except ValueError:
+            pass
+
+
 def main():
-    outcome_links_lists = crawler.read_page_outcome_links()
+    outcome_links = crawler.read_page_outcome_links()
     index = task_5.get_index()
-    income_links_lists = convert_to_income_links_list(outcome_links_lists, index)
-    ranks = rank(outcome_links_lists, index, 0.5)
+
+    filter_self_loop_links(outcome_links)
+    income_links = convert_to_income_links(outcome_links)
+    ranks = rank(outcome_links, index, 0.5)
     print(ranks)
 
 
