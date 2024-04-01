@@ -1,3 +1,5 @@
+from typing import List
+
 import task_5
 import crawler
 
@@ -6,10 +8,10 @@ def invert_dictionary(dictionary):
     return dict((v, k) for k, v in dictionary.items())
 
 
-def convert_to_income_links_list(links_list: list[list], index: dict):
+def convert_to_income_links_list(links_list: List[list], index: dict):
     pages_count = len(index)
     inverted_index = invert_dictionary(index)
-    income_links_list: list[list] = [list()] * pages_count
+    income_links_list: List[list] = [list()] * pages_count
     for i in range(pages_count):
         for outcome_link in links_list[i]:
             if (outcome_link in inverted_index) and (outcome_link not in income_links_list[inverted_index[outcome_link]]):
@@ -18,15 +20,15 @@ def convert_to_income_links_list(links_list: list[list], index: dict):
     return income_links_list
 
 
-def rank(outcome_links_list: list[list], index, threshold: float = 0.000001) -> list:
+def rank(outcome_links_list: List[list], index, threshold: float = 0.000001) -> list:
     inverted_index = invert_dictionary(index)
-    income_links_list: list[list] = convert_to_income_links_list(outcome_links_list, index)
+    income_links_list: List[list] = convert_to_income_links_list(outcome_links_list, index)
     current_pagerank_of_links: list = [1 / len(index)] * len(outcome_links_list)
     result_pagerank_of_links: list = []
-    delta_current_and_previous_links_pagerank_list: list[int] = []
+    delta_current_and_previous_links_pagerank_list: List[int] = []
     while True:
         current_link_index = 0
-        delta_current_and_previous_links_pagerank_list: list[int] = []
+        delta_current_and_previous_links_pagerank_list: List[int] = []
         result_pagerank_of_links: list = []
         for income_links in income_links_list:
             pagerank_of_current_link = 0
@@ -54,7 +56,7 @@ def pagination():
 
 
 def main():
-    outcome_links_lists = crawler.main()
+    outcome_links_lists = crawler.read_page_outcome_links()
     index = task_5.get_index()
     income_links_lists = convert_to_income_links_list(outcome_links_lists, index)
     ranks = rank(outcome_links_lists, index, 0.5)

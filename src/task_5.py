@@ -2,6 +2,8 @@ from copy import copy
 
 import nltk
 import pymorphy3
+from typing import Dict, List
+
 from task_4 import is_correct
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
@@ -19,7 +21,7 @@ class VectorSearch:
         self.stop_words = set(stopwords.words('russian'))
         self.morph_analyzer = pymorphy3.MorphAnalyzer()
 
-    def scalar_product(self, vector1: list[float], vector2: list[float]) -> float:
+    def scalar_product(self, vector1: List[float], vector2: List[float]) -> float:
         return sum(map(lambda first, second: first * second, vector1, vector2))
 
     def calculate_distance(self, first_vector: list, second_vector: list):
@@ -30,7 +32,7 @@ class VectorSearch:
         pages_tokens = get_pages_tokens(processing_context)
         lemma_tf = calculate_lemma_tf(processing_context, pages_tokens)
         lemma_idf = calculate_lemmas_idf(lemma_tf)
-        pages_tf_idf: list[dict[str, float]] = list()
+        pages_tf_idf: List[Dict[str, float]] = list()
         for page_number in range(0, len(lemma_tf)):
             lemma_tf_idf = {}
             for term in lemma_tf[page_number]:
@@ -42,7 +44,7 @@ class VectorSearch:
         return pages_tf_idf, lemma_idf
 
     def calculate_query_tf_idf(self, query_lemmas_tf, pages_idf):
-        query_tf_idf: dict[str, float] = {x: 0 for x in copy(pages_idf)}
+        query_tf_idf: Dict[str, float] = {x: 0 for x in copy(pages_idf)}
         for lemma in query_lemmas_tf:
             if lemma in pages_idf:
                 query_tf_idf[lemma] = query_lemmas_tf[lemma] * pages_idf[lemma]
@@ -69,7 +71,7 @@ class VectorSearch:
         return complemented_page_vector
 
 
-    def search(self, pages_lemmas_tf_idf: list[dict], query_lemmas_tf_idf: dict):
+    def search(self, pages_lemmas_tf_idf: List[dict], query_lemmas_tf_idf: dict):
         result_documents = list()
 
         query_vector_tf_idf = list(
@@ -93,7 +95,7 @@ def get_normalized_form(processing_context, token):
 
 
 def get_index():
-    index: dict[int, str] = {}
+    index: Dict[int, str] = {}
     with open('raw-pages/index.txt', 'r', encoding='utf-8') as index_file:
         line = index_file.readline()
         while line:
