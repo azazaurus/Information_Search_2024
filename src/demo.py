@@ -1,11 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import task_5
 import crawler
-
-
-def invert_dictionary(dictionary):
-    return dict((v, k) for k, v in dictionary.items())
 
 
 def convert_to_income_links(outcome_links: Dict[int, List[int]]) -> Dict[int, List[int]]:
@@ -17,35 +13,35 @@ def convert_to_income_links(outcome_links: Dict[int, List[int]]) -> Dict[int, Li
     return income_links
 
 
-def rank(outcome_links_list: List[list], index, threshold: float = 0.000001) -> list:
-    inverted_index = invert_dictionary(index)
-    income_links_list: List[list] = convert_to_income_links_list(outcome_links_list, index)
-    current_pagerank_of_links: list = [1 / len(index)] * len(outcome_links_list)
-    result_pagerank_of_links: list = []
-    delta_current_and_previous_links_pagerank_list: List[int] = []
+def rank(
+        outcome_links: Dict[int, List[int]],
+        income_links: Dict[int, List[int]],
+        threshold: float = 0.000001
+    ) -> Dict[int, float]:
+    page_count = len(income_links)
+    initial_page_rank_value = 1 / page_count
+    previous_page_ranks = {page_id: initial_page_rank_value for page_id in income_links}
+
     while True:
-        current_link_index = 0
-        delta_current_and_previous_links_pagerank_list: List[int] = []
-        result_pagerank_of_links: list = []
-        for income_links in income_links_list:
-            pagerank_of_current_link = 0
-            for link in income_links:
-                link_index = inverted_index[link]
-                pagerank_of_current_link += current_pagerank_of_links[link_index] / len(income_links[link_index])
+        page_rank_contributions = {page_id: page_rank / len(outcome_links[page_id])
+            for page_id, page_rank in previous_page_ranks.items()}
 
-            result_pagerank_of_links.append(pagerank_of_current_link)
-            current_pagerank_of_link = current_pagerank_of_links[current_link_index]
-            result_pagerank_of_link = result_pagerank_of_links[current_link_index]
-            delta_current_and_previous_links_pagerank = abs(current_pagerank_of_link
-                 - result_pagerank_of_link)
-            delta_current_and_previous_links_pagerank_list.append(delta_current_and_previous_links_pagerank)
+        max_page_rank_delta: Optional[float] = None
+        current_page_ranks: Dict[int, float] = {}
+        for page_id, page_income_links in income_links.items():
+            page_rank = sum(page_rank_contributions[source_page_id] for source_page_id in page_income_links)
+            current_page_ranks[page_id] = page_rank
 
-        if max(delta_current_and_previous_links_pagerank_list) < threshold:
+            page_rank_delta = abs(page_rank - previous_page_ranks[page_id])
+            max_page_rank_delta = (page_rank_delta
+                if max_page_rank_delta is None
+                else max(max_page_rank_delta, page_rank_delta))
+
+        previous_page_ranks = current_page_ranks
+        if max_page_rank_delta < threshold:
             break
 
-        current_pagerank_of_links = result_pagerank_of_links
-
-    return result_pagerank_of_links
+    return previous_page_ranks
 
 
 def pagination():
@@ -66,7 +62,7 @@ def main():
 
     filter_self_loop_links(outcome_links)
     income_links = convert_to_income_links(outcome_links)
-    ranks = rank(outcome_links, index, 0.5)
+    ranks = rank(outcome_links, income_links)
     print(ranks)
 
 
