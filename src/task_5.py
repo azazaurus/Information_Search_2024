@@ -83,8 +83,9 @@ class VectorSearch:
                 map(
                     lambda x: x[1],
                     sorted(pages_lemmas_tf_idf[page_id].items(), key = lambda x: x[0])))
-            if self.calculate_distance(page_vector_tf_idf, query_vector_tf_idf) < self.__distance_threshold:
-                result_documents.append(page_id)
+            distance_to_page = self.calculate_distance(page_vector_tf_idf, query_vector_tf_idf)
+            if distance_to_page < self.__distance_threshold:
+                result_documents.append((page_id, distance_to_page))
 
         return result_documents
 
@@ -127,7 +128,7 @@ def main():
 
         print('\n\nРезультаты: \n')
         if len(result_documents) > 0:
-            for document_id in result_documents:
+            for document_id, _ in result_documents:
                 url = index[str(document_id)]
                 print('ID страницы: ' + str(document_id) + ' | URL: ' + url)
         else:
