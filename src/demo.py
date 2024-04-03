@@ -1,8 +1,9 @@
-from typing import List
+from typing import Dict, List
 
 from flask import Flask, render_template, request
 from urllib.parse import unquote_plus
 
+import page_rank
 import task_5
 
 
@@ -14,10 +15,10 @@ class SearchResult:
 
 
 class VectorSearch:
-    def __init__(self):
+    def __init__(self, index: Dict[int, str]):
         self.pc = task_5.ProcessingContext()
         self.vector_search = task_5.VectorSearch()
-        self.index = task_5.get_index()
+        self.index = index
         self.lemmas_tf_idf, self.lemmas_idf = self.vector_search.calculate_pages_tf_idf()
 
     def search(self, query: str) -> List[SearchResult]:
@@ -60,7 +61,8 @@ class VectorSearch:
             result.score = (1 - (result.score - min_score) / min_max_score_difference) * 100
 
 
-vector_search = VectorSearch()
+index = task_5.get_index() 
+vector_search = VectorSearch(index)
 
 app = Flask(__name__, static_folder = "../static", template_folder = "../templates")
 
@@ -71,6 +73,18 @@ def search():
     search_query = decoded_query[len("query="):]
     search_results = vector_search.search(search_query)
     return render_template("search.html", search_query = search_query, search_results = search_results)
+
+
+@app.route("/page-ranks")
+def page_ranks():
+    page_ranks = page_rank.get_page_rank()
+
+    page_rank_results: List[SearchResult] = []
+    for page_id, page_rank_value in page_ranks.items():
+        page_url = index[page_id]
+        page_rank_results.append(SearchResult(page_url, page_url, page_rank_value))
+    page_rank_results.sort(key = lambda x: x.score, reverse = True)
+    return render_template("page-ranks.html", page_ranks = page_rank_results)
 
 
 if __name__ == "__main__":

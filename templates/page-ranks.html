@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PageRank</title>
+</head>
+<body>
+    <div>
+    {% for page_rank in page_ranks %}
+        <div style="margin-top: 7px;">
+            <a href="{{page_rank.url}}">{{page_rank.title}}</a><br />
+            PageRank: {{page_rank.score}}
+        </div>
+    {% endfor %}
+    </div>
+</body>
+</html>
