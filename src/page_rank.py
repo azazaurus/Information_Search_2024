@@ -1,6 +1,5 @@
 from typing import Dict, List, Optional
 
-import task_5
 import crawler
 
 
@@ -13,7 +12,7 @@ def convert_to_income_links(outcome_links: Dict[int, List[int]]) -> Dict[int, Li
     return income_links
 
 
-def rank(
+def calculate_page_rank(
         outcome_links: Dict[int, List[int]],
         income_links: Dict[int, List[int]],
         threshold: float = 0.000001
@@ -44,10 +43,6 @@ def rank(
     return previous_page_ranks
 
 
-def pagination():
-    raise NotImplemented
-
-
 def filter_self_loop_links(links: Dict[int, List[int]]):
     for page_id, page_links in links.items():
         try:
@@ -56,15 +51,8 @@ def filter_self_loop_links(links: Dict[int, List[int]]):
             pass
 
 
-def main():
+def get_page_rank():
     outcome_links = crawler.read_page_outcome_links()
-    index = task_5.get_index()
-
     filter_self_loop_links(outcome_links)
     income_links = convert_to_income_links(outcome_links)
-    ranks = rank(outcome_links, income_links)
-    print(ranks)
-
-
-if __name__ == '__main__':
-    main()
+    return calculate_page_rank(outcome_links, income_links)
