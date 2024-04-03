@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% if search_query|length() > 0 %}
+            {{search_query}} - Vector search demo
+        {% else %}
+            Vector search demo
+        {% endif %}
+    </title>
+</head>
+<body>
+    <div>
+        <form method="get">
+            <input type="text" name="query" value="{{search_query}}" />
+            <input type="submit" value="Search">
+        </form>
+    </div>
+    <div>
+    {% for result in search_results %}
+        <div style="margin-top: 7px;">
+            <a href="{{result.url}}">{{result.title}}</a><br />
+            Score: {{result.score}}
+        </div>
+    {% endfor %}
+    </div>
+</body>
+</html>
